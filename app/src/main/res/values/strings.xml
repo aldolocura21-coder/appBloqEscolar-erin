@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">BloqEscolar</string>
+    <string name="school_block_active">Bloqueo Escolar Activo</string>
+    <string name="school_lock_subtitle">Enfócate en tus clases y tareas</string>
+    <string name="unlock_challenge_btn">Desbloquear con Reto Educativo</string>
+    <string name="parental_pin_btn">Acceso de Padres (PIN)</string>
+    <string name="emergency_call_btn">Llamada de Emergencia</string>
+    <string name="unlocked_time_remaining">Tiempo Desbloqueado</string>
+    <string name="lock_now_btn">Bloquear Ahora</string>
+    <string name="more_time_btn">Ganar Más Tiempo (+15 min)</string>
+    <string name="avatar_btn">Mi Avatar</string>
+    <string name="weekend_hub_btn">Premios Fin de Semana</string>
+    <string name="settings_btn">Control Parental</string>
+</resources>
