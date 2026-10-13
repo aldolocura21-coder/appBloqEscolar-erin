@@ -1,4 +1,5 @@
 import com.google.gms.googleservices.GoogleServicesPlugin.MissingGoogleServicesStrategy
+import java.util.Base64
 
 plugins {
   alias(libs.plugins.android.application)
@@ -20,6 +21,24 @@ android {
     versionName = "1.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+  }
+
+  val debugKeystoreFile = file("${rootDir}/debug.keystore")
+  val base64KeystoreFile = file("${rootDir}/debug.keystore.base64")
+  if (!debugKeystoreFile.exists()) {
+    if (base64KeystoreFile.exists()) {
+      try {
+        val decoded = Base64.getDecoder().decode(base64KeystoreFile.readText().trim())
+        debugKeystoreFile.writeBytes(decoded)
+      } catch (_: Exception) {}
+    } else {
+      val userHomeKeystore = file("${System.getProperty("user.home")}/.android/debug.keystore")
+      if (userHomeKeystore.exists()) {
+        try {
+          userHomeKeystore.copyTo(debugKeystoreFile, overwrite = true)
+        } catch (_: Exception) {}
+      }
+    }
   }
 
   // Do not remove or modify these signingConfigs. They are necessary for building, installing,
