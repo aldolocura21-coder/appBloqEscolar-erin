@@ -1,6 +1,7 @@
 package com.example
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
 import android.widget.Toast
@@ -65,9 +66,55 @@ class MainActivity : ComponentActivity() {
         viewModel.checkAndEnforceLock()
     }
 
+    override fun onPause() {
+        super.onPause()
+        reassertLockToFrontIfNeeded()
+    }
+
+    override fun onUserLeaveHint() {
+        super.onUserLeaveHint()
+        reassertLockToFrontIfNeeded()
+    }
+
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        val state = viewModel.uiState.value
+        if (!hasFocus && state.isLocked && state.currentScreen in listOf(AppScreen.LOCK, AppScreen.ACTIVITY_RUNNER)) {
+            try {
+                @Suppress("DEPRECATION")
+                val closeIntent = Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS)
+                sendBroadcast(closeIntent)
+            } catch (_: Exception) {}
+            reassertLockToFrontIfNeeded()
+        }
+    }
+
+    private fun reassertLockToFrontIfNeeded() {
+        val state = viewModel.uiState.value
+        if (state.isLocked && state.currentScreen in listOf(AppScreen.LOCK, AppScreen.ACTIVITY_RUNNER)) {
+            val intent = Intent(this, MainActivity::class.java).apply {
+                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+            }
+            startActivity(intent)
+        }
+    }
+
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        val state = viewModel.uiState.value
+
+        if (keyCode == KeyEvent.KEYCODE_APP_SWITCH || keyCode == 187) {
+            if (state.isLocked) {
+                Toast.makeText(
+                    this,
+                    "¡Aplicaciones recientes bloqueadas! Resuelve el reto para usar el teléfono.",
+                    Toast.LENGTH_SHORT
+                ).show()
+                return true
+            }
+        }
+
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            val state = viewModel.uiState.value
             when (state.currentScreen) {
                 AppScreen.LOCK -> {
                     Toast.makeText(

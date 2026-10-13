@@ -87,13 +87,19 @@ object GeminiAiService {
             return@withContext EducationalQuestionsRepository.getRandomQuestions(count, subject)
         }
 
+        val subjectContext = if (subject == Subject.FAMILY) {
+            "El tema es 'Interacción en Familia con Adultos'. Las preguntas deben ser retos para que el niño/a dialogue, pregunte o interactúe con un adulto (mamá, papá o familiar) como acertijos compartidos, preguntas de su infancia o cálculo mental conjunto."
+        } else {
+            "Genera preguntas educativas para la materia '${subject.displayName}', con dificultad adaptada perfectamente a un niño/a de $age años ($gradeLevel)."
+        }
+
         val prompt = """
             Eres un profesor pedagógico experto para un estudiante de $age años (Nivel educativo escolar: $gradeLevel).
-            Genera una lista de $count preguntas educativas para la materia '${subject.displayName}', con dificultad adaptada perfectamente a un niño/a de $age años ($gradeLevel).
+            $subjectContext
             Devuelve ÚNICAMENTE un formato JSON estricto con la siguiente estructura y sin bloques de código markdown:
             [
               {
-                "question": "¿Pregunta clara adaptada a $age años?",
+                "question": "¿Pregunta o reto interactivo adaptado a $age años?",
                 "options": ["Opción A", "Opción B", "Opción C", "Opción D"],
                 "correctIndex": 0,
                 "explanation": "Breve explicación pedagógica y motivadora para el alumno."

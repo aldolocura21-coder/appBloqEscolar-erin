@@ -31,6 +31,7 @@ data class ParentSettings(
     val minutesPerChallenge: Int = 15,
     val maxDailyMinutes: Int = 90,
     val strictMode: Boolean = false,
+    val familyActivityEveryOtherDay: Boolean = true,
     val emergencyContacts: List<EmergencyContact> = listOf(
         EmergencyContact("1", "Mamá", "Madre", "+34600111222"),
         EmergencyContact("2", "Papá", "Padre", "+34600333444"),

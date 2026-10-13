@@ -87,6 +87,7 @@ fun ParentalControlDialog(
     var endHour by remember { mutableIntStateOf(parentSettings.schoolSchedule.endHour) }
     var minutesPerChallenge by remember { mutableIntStateOf(parentSettings.minutesPerChallenge) }
     var strictMode by remember { mutableStateOf(parentSettings.strictMode) }
+    var familyActivityEveryOtherDay by remember { mutableStateOf(parentSettings.familyActivityEveryOtherDay) }
     var newPin by remember { mutableStateOf(parentSettings.pin) }
 
     Dialog(
@@ -350,6 +351,49 @@ fun ParentalControlDialog(
                             )
                         }
 
+                        // Actividad con adultos día por medio
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(text = "Actividad con Adultos Día por Medio", fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                Text(text = "Retos de interacción y diálogo familiar en días alternos", fontSize = 12.sp, color = Color.Gray)
+                            }
+                            Switch(
+                                checked = familyActivityEveryOtherDay,
+                                onCheckedChange = { familyActivityEveryOtherDay = it },
+                                colors = SwitchDefaults.colors(checkedThumbColor = Color.White, checkedTrackColor = SchoolBluePrimary)
+                            )
+                        }
+
+                        // Info de seguridad y apps recientes
+                        Surface(
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(12.dp),
+                            color = Color(0xFFF1F5F9)
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(12.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Security,
+                                    contentDescription = null,
+                                    tint = SchoolBluePrimary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text(
+                                    text = "Protección Antisalida: El botón de aplicaciones recientes y notificaciones se bloquea reordenando esta pantalla automáticamente.",
+                                    fontSize = 11.sp,
+                                    color = Color(0xFF334155),
+                                    lineHeight = 15.sp
+                                )
+                            }
+                        }
+
                         // Change PIN
                         OutlinedTextField(
                             value = newPin,
@@ -369,7 +413,8 @@ fun ParentalControlDialog(
                                     pin = if (newPin.isNotBlank()) newPin else "1234",
                                     schoolSchedule = parentSettings.schoolSchedule.copy(enabled = scheduleEnabled),
                                     minutesPerChallenge = minutesPerChallenge,
-                                    strictMode = strictMode
+                                    strictMode = strictMode,
+                                    familyActivityEveryOtherDay = familyActivityEveryOtherDay
                                 )
                                 onSaveSettings(updated)
                                 onDismiss()

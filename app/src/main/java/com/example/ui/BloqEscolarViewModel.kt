@@ -63,7 +63,8 @@ data class BloqUiState(
     val emergencyContactToDial: EmergencyContact? = null,
     val statusMessage: String? = null,
     val installedApps: List<InstalledAppItem> = emptyList(),
-    val shouldExitToBackground: Boolean = false
+    val shouldExitToBackground: Boolean = false,
+    val isFamilyDay: Boolean = true
 )
 
 class BloqEscolarViewModel(application: Application) : AndroidViewModel(application) {
@@ -97,6 +98,7 @@ class BloqEscolarViewModel(application: Application) : AndroidViewModel(applicat
         val remainingSecs = if (unlockedUntil > now) (unlockedUntil - now) / 1000L else 0L
         val schoolHours = checkIsSchoolHours(loadedSettings)
         val locked = remainingSecs <= 0
+        val familyDay = isFamilyDayToday(loadedSettings)
 
         val initialScreen = if (!loadedProfile.isOnboardingCompleted) {
             AppScreen.ONBOARDING
@@ -113,9 +115,18 @@ class BloqEscolarViewModel(application: Application) : AndroidViewModel(applicat
                 isLocked = locked,
                 remainingUnlockedSeconds = remainingSecs,
                 isSchoolHoursActive = schoolHours,
-                currentScreen = initialScreen
+                currentScreen = initialScreen,
+                isFamilyDay = familyDay
             )
         }
+    }
+
+    private fun isFamilyDayToday(settings: ParentSettings): Boolean {
+        if (!settings.familyActivityEveryOtherDay) return false
+        val cal = Calendar.getInstance()
+        val dayOfYear = cal.get(Calendar.DAY_OF_YEAR)
+        // Alternate days (día por medio): day of year modulo 2
+        return (dayOfYear % 2 != 0)
     }
 
     private fun checkIsSchoolHours(settings: ParentSettings): Boolean {
@@ -172,11 +183,13 @@ class BloqEscolarViewModel(application: Application) : AndroidViewModel(applicat
                         AppScreen.LOCK
                     } else current.currentScreen
 
+                    val familyDay = isFamilyDayToday(current.parentSettings)
                     current.copy(
                         remainingUnlockedSeconds = remaining,
                         isSchoolHoursActive = schoolHours,
                         isLocked = shouldBeLocked,
-                        currentScreen = screen
+                        currentScreen = screen,
+                        isFamilyDay = familyDay
                     )
                 }
             }
@@ -529,9 +542,11 @@ class BloqEscolarViewModel(application: Application) : AndroidViewModel(applicat
 
     fun saveParentSettings(newSettings: ParentSettings) {
         prefs.saveParentSettings(newSettings)
+        val familyDay = isFamilyDayToday(newSettings)
         _uiState.update {
             it.copy(
                 parentSettings = newSettings,
+                isFamilyDay = familyDay,
                 statusMessage = "Configuración parental guardada correctamente"
             )
         }

@@ -6,6 +6,7 @@ enum class Subject(val displayName: String, val iconName: String) {
     SCIENCE("Ciencias Naturales", "biotech"),
     HISTORY("Historia y Geo", "public"),
     LOGIC("Lógica y Acertijos", "psychology"),
+    FAMILY("En Familia con Adultos", "family_restroom"),
     AI_SPECIAL("Misión IA Gemini", "auto_awesome")
 }
 

@@ -165,6 +165,68 @@ object EducationalQuestionsRepository {
             options = listOf("Invierno", "María", "Abril", "Rosa"),
             correctIndex = 1,
             explanation = "La cuarta hija es María, como indica el inicio del acertijo."
+        ),
+
+        // Actividades en Familia e Interacción con Adultos (Día por medio)
+        ActivityQuestion(
+            id = "fam_1",
+            subject = Subject.FAMILY,
+            question = "👨‍👩‍👧‍👦 Pregúntale a un adulto: ¿A qué jugaba al aire libre cuando tenía tu edad? Conversen y elijan una respuesta.",
+            options = listOf("Ya conversamos y me contó su juego de infancia", "Me enseñó a qué jugaba y sus anécdotas", "Hablamos de cómo jugaban sin móviles", "Descubrí a qué le gustaba jugar"),
+            correctIndex = 0,
+            explanation = "¡Hermoso momento compartido! Aprender de las infancias de nuestros padres o familiares fortalece los lazos familiares.",
+            xpReward = 35,
+            coinsReward = 15
+        ),
+        ActivityQuestion(
+            id = "fam_2",
+            subject = Subject.FAMILY,
+            question = "👨‍👩‍👧‍👦 Cálculo mental en equipo con un adulto: Si sumas tu edad actual más la edad del adulto, ¿cuántos años suman entre los dos?",
+            options = listOf("Ya calculamos la suma de nuestras dos edades", "Calculamos la diferencia de años entre ambos", "El adulto me ayudó con la suma mental", "Sumamos y nos dio un número exacto"),
+            correctIndex = 0,
+            explanation = "¡Gran trabajo en equipo! Las matemáticas se disfrutan mucho más compartiendo el cálculo en familia.",
+            xpReward = 35,
+            coinsReward = 15
+        ),
+        ActivityQuestion(
+            id = "fam_3",
+            subject = Subject.FAMILY,
+            question = "👨‍👩‍👧‍👦 Pide a un adulto que te enseñe un refrán o dicho popular que conozca y te explique qué significa.",
+            options = listOf("Me enseñó un refrán y comprendí su significado", "Conversamos sobre la sabiduría de los refranes", "El adulto recordó un consejo de sus abuelos", "Compartimos un dicho popular tradicional"),
+            correctIndex = 0,
+            explanation = "Los refranes y consejos populares transmiten sabiduría que pasa de generación en generación.",
+            xpReward = 35,
+            coinsReward = 15
+        ),
+        ActivityQuestion(
+            id = "fam_4",
+            subject = Subject.FAMILY,
+            question = "👨‍👩‍👧‍👦 Pregúntale a un adulto: ¿Cuál era su asignatura o materia favorita en la escuela y por qué?",
+            options = listOf("Ya me contó cuál era su materia favorita", "Me explicó por qué le apasionaba esa materia", "Conversamos de sus profesores y materias", "Comparamos sus materias con las mías hoy"),
+            correctIndex = 0,
+            explanation = "¡Genial! Conocer las materias favoritas de los adultos te ayuda a descubrir nuevas curiosidades e intereses escolares.",
+            xpReward = 35,
+            coinsReward = 15
+        ),
+        ActivityQuestion(
+            id = "fam_5",
+            subject = Subject.FAMILY,
+            question = "👨‍👩‍👧‍👦 Conversación en familia: Pregúntale a un adulto cómo era la vida diaria cuando no existían los smartphones.",
+            options = listOf("Me contó cómo se comunicaban sin celulares", "Me explicó cómo buscaban información en libros", "Conversamos de cómo se divertían antes", "Comprendí cómo cambiaron las costumbres"),
+            correctIndex = 0,
+            explanation = "¡Qué interesante! Valorar la tecnología actual y recordar las tradiciones pasadas es una gran enseñanza familiar.",
+            xpReward = 35,
+            coinsReward = 15
+        ),
+        ActivityQuestion(
+            id = "fam_6",
+            subject = Subject.FAMILY,
+            question = "👨‍👩‍👧‍👦 Gratitud y empatía familiar: Cada uno (tú y el adulto) debe contar una cosa buena que le pasó en el día.",
+            options = listOf("Compartimos ambos algo positivo de nuestro día", "Nos agradecimos mutuamente un gesto lindo", "Fue un momento muy cálido y alegre", "Nos alegramos de escucharnos"),
+            correctIndex = 0,
+            explanation = "La gratitud y escuchar cómo le fue al otro crea un ambiente de confianza y cariño en casa.",
+            xpReward = 35,
+            coinsReward = 15
         )
     )
 

@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Star
@@ -73,7 +74,9 @@ fun PhoneLockScreen(
     onOpenWeekendHub: () -> Unit,
     onOpenLauncherHelp: () -> Unit
 ) {
-    var selectedSubject by remember { mutableStateOf(Subject.MATH) }
+    var selectedSubject by remember(state.isFamilyDay) {
+        mutableStateOf(if (state.isFamilyDay) Subject.FAMILY else Subject.MATH)
+    }
     val timeFormat = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
     val currentTime = remember { timeFormat.format(Date()) }
 
@@ -130,6 +133,87 @@ fun PhoneLockScreen(
             }
 
             Spacer(modifier = Modifier.height(20.dp))
+
+            // Banner Especial Día por Medio: Reto Familiar con Adultos
+            if (state.isFamilyDay && state.parentSettings.familyActivityEveryOtherDay) {
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            selectedSubject = Subject.FAMILY
+                            onStartChallenge(Subject.FAMILY)
+                        }
+                        .testTag("family_day_banner"),
+                    shape = RoundedCornerShape(18.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFF78350F).copy(alpha = 0.9f)),
+                    border = androidx.compose.foundation.BorderStroke(1.5.dp, GoldReward)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(14.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .clip(CircleShape)
+                                .background(GoldReward.copy(alpha = 0.25f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.People,
+                                contentDescription = null,
+                                tint = GoldReward,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = "👨‍👩‍👧‍👦 ¡Hoy Toca Reto Familiar!",
+                                    color = GoldReward,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 14.sp
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = "DÍA POR MEDIO",
+                                    color = Color.White,
+                                    fontSize = 9.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    modifier = Modifier
+                                        .clip(RoundedCornerShape(4.dp))
+                                        .background(Color(0xFFB45309))
+                                        .padding(horizontal = 5.dp, vertical = 2.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = "Actividad con adultos para dialogar en familia (+15 monedas ⭐).",
+                                color = Color(0xFFFDE68A),
+                                fontSize = 11.sp,
+                                lineHeight = 15.sp
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Button(
+                            onClick = {
+                                selectedSubject = Subject.FAMILY
+                                onStartChallenge(Subject.FAMILY)
+                            },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = GoldReward,
+                                contentColor = Color(0xFF451A03)
+                            ),
+                            shape = RoundedCornerShape(10.dp),
+                            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                        ) {
+                            Text(text = "Hacer", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        }
+                    }
+                }
+                Spacer(modifier = Modifier.height(14.dp))
+            }
 
             // 2. Child Avatar Card
             Card(
@@ -225,7 +309,7 @@ fun PhoneLockScreen(
 
             Spacer(modifier = Modifier.height(10.dp))
 
-            // Subject chips
+            // Subject chips - Fila 1
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -252,6 +336,7 @@ fun PhoneLockScreen(
 
             Spacer(modifier = Modifier.height(8.dp))
 
+            // Subject chips - Fila 2
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -269,12 +354,22 @@ fun PhoneLockScreen(
                     onClick = { selectedSubject = Subject.LOGIC }
                 )
                 SubjectChip(
-                    subject = Subject.AI_SPECIAL,
-                    isSelected = selectedSubject == Subject.AI_SPECIAL,
+                    subject = Subject.FAMILY,
+                    isSelected = selectedSubject == Subject.FAMILY,
                     modifier = Modifier.weight(1f),
-                    onClick = { selectedSubject = Subject.AI_SPECIAL }
+                    onClick = { selectedSubject = Subject.FAMILY }
                 )
             }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            // Subject chips - Fila 3: IA Gemini
+            SubjectChip(
+                subject = Subject.AI_SPECIAL,
+                isSelected = selectedSubject == Subject.AI_SPECIAL,
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { selectedSubject = Subject.AI_SPECIAL }
+            )
 
             Spacer(modifier = Modifier.height(18.dp))
 

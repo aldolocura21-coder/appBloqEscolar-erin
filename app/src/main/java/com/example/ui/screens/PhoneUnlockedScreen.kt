@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.GridView
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PhoneAndroid
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
@@ -88,9 +89,6 @@ fun PhoneUnlockedScreen(
     onExitToSystemHome: () -> Unit
 ) {
     val context = LocalContext.current
-    var searchQuery by remember { mutableStateOf("") }
-    var isGridView by remember { mutableStateOf(true) }
-
     val totalSecs = state.remainingUnlockedSeconds
     val minutes = totalSecs / 60
     val seconds = totalSecs % 60
@@ -98,11 +96,6 @@ fun PhoneUnlockedScreen(
 
     val progress = (totalSecs.toFloat() / (state.parentSettings.minutesPerChallenge * 60f)).coerceIn(0f, 1f)
     val animatedProgress by animateFloatAsState(targetValue = progress, label = "progress")
-
-    val filteredInstalledApps = remember(searchQuery, state.installedApps) {
-        if (searchQuery.isBlank()) state.installedApps
-        else state.installedApps.filter { it.label.contains(searchQuery, ignoreCase = true) }
-    }
 
     Column(
         modifier = Modifier
@@ -382,246 +375,154 @@ fun PhoneUnlockedScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(22.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
-        // APP DRAWER / CAJÓN DE TODAS LAS APLICACIONES
-        Row(
+        // Reto Familiar Disponible Día por Medio
+        if (state.isFamilyDay && state.parentSettings.familyActivityEveryOtherDay) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onMoreTimeClick(Subject.FAMILY) }
+                    .testTag("unlocked_family_banner"),
+                shape = RoundedCornerShape(18.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFFEF3C7)),
+                border = androidx.compose.foundation.BorderStroke(1.dp, GoldReward)
+            ) {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(42.dp)
+                            .clip(CircleShape)
+                            .background(GoldReward.copy(alpha = 0.25f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.People,
+                            contentDescription = null,
+                            tint = Color(0xFFB45309),
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = "👨‍👩‍👧‍👦 Reto Familiar con Adultos",
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 14.sp,
+                                color = Color(0xFF78350F)
+                            )
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Text(
+                                text = "DÍA POR MEDIO",
+                                color = Color.White,
+                                fontSize = 9.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(4.dp))
+                                    .background(Color(0xFFB45309))
+                                    .padding(horizontal = 5.dp, vertical = 2.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = "Gana +15 min resolviendo una actividad junto a un adulto.",
+                            fontSize = 11.sp,
+                            color = Color(0xFF92400E)
+                        )
+                    }
+                    Button(
+                        onClick = { onMoreTimeClick(Subject.FAMILY) },
+                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFB45309)),
+                        shape = RoundedCornerShape(10.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        Text(text = "+15 min", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+
+        // Card de Información y Estado del Teléfono Libre
+        Card(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            shape = RoundedCornerShape(22.dp),
+            colors = CardDefaults.cardColors(containerColor = Color.White),
+            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
         ) {
-            Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(22.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(52.dp)
+                        .clip(CircleShape)
+                        .background(SuccessGreen.copy(alpha = 0.14f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = SuccessGreen,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(12.dp))
+
                 Text(
-                    text = "Todas tus Aplicaciones (${filteredInstalledApps.size})",
+                    text = "¡Disfruta de tu Teléfono!",
                     fontWeight = FontWeight.Bold,
                     fontSize = 17.sp,
                     color = Color(0xFF0F172A)
                 )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
                 Text(
-                    text = "Toca cualquier aplicación para abrirla directamente",
-                    fontSize = 12.sp,
-                    color = Color(0xFF64748B)
+                    text = "Todas tus aplicaciones, juegos y redes están disponibles normalmente en tu pantalla de inicio de Android habitual.",
+                    fontSize = 13.sp,
+                    color = Color(0xFF64748B),
+                    textAlign = TextAlign.Center,
+                    lineHeight = 18.sp
                 )
-            }
 
-            // Vista Cuadrícula o Lista
-            Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(Color(0xFFE2E8F0))
-                    .padding(2.dp)
-            ) {
-                IconButton(
-                    onClick = { isGridView = true },
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
                     modifier = Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(if (isGridView) Color.White else Color.Transparent)
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFFF1F5F9))
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Default.GridView,
-                        contentDescription = "Cuadrícula",
-                        tint = if (isGridView) SchoolBluePrimary else Color.Gray,
-                        modifier = Modifier.size(18.dp)
+                        imageVector = Icons.Default.PhoneAndroid,
+                        contentDescription = null,
+                        tint = SchoolBluePrimary,
+                        modifier = Modifier.size(20.dp)
                     )
-                }
-                IconButton(
-                    onClick = { isGridView = false },
-                    modifier = Modifier
-                        .size(32.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(if (!isGridView) Color.White else Color.Transparent)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ViewList,
-                        contentDescription = "Lista",
-                        tint = if (!isGridView) SchoolBluePrimary else Color.Gray,
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.height(10.dp))
-
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = { searchQuery = it },
-            placeholder = { Text("Buscar aplicación...", fontSize = 14.sp) },
-            leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(14.dp)
-        )
-
-        Spacer(modifier = Modifier.height(12.dp))
-
-        if (filteredInstalledApps.isNotEmpty()) {
-            if (isGridView) {
-                // CUADRÍCULA ESTILO LAUNCHER (4 COLUMNAS)
-                val chunkedApps = remember(filteredInstalledApps) { filteredInstalledApps.chunked(4) }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(14.dp)
-                ) {
-                    chunkedApps.forEach { rowApps ->
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            rowApps.forEach { appItem ->
-                                AppGridItem(
-                                    appItem = appItem,
-                                    modifier = Modifier.weight(1f),
-                                    onClick = { DeviceAppsManager.launchApp(context, appItem.packageName) }
-                                )
-                            }
-                            // Fill remaining spaces in row
-                            repeat(4 - rowApps.size) {
-                                Spacer(modifier = Modifier.weight(1f))
-                            }
-                        }
-                    }
-                }
-            } else {
-                // LISTA DE APLICACIONES
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    filteredInstalledApps.forEach { appItem ->
-                        Surface(
-                            onClick = { DeviceAppsManager.launchApp(context, appItem.packageName) },
-                            shape = RoundedCornerShape(14.dp),
-                            color = Color.White,
-                            shadowElevation = 1.dp,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Row(
-                                modifier = Modifier.padding(12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                AppIconView(appItem = appItem, size = 42.dp)
-                                Spacer(modifier = Modifier.width(12.dp))
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(
-                                        text = appItem.label,
-                                        fontWeight = FontWeight.SemiBold,
-                                        fontSize = 14.sp,
-                                        color = Color(0xFF0F172A),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                    Text(
-                                        text = appItem.packageName,
-                                        fontSize = 11.sp,
-                                        color = Color(0xFF94A3B8),
-                                        maxLines = 1,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
-                                }
-                                Text(
-                                    text = "Abrir ↗",
-                                    fontSize = 13.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = SuccessGreen
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-        } else {
-            // Default allowed apps if no external apps discovered
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                state.parentSettings.allowedApps.filter { it.isEnabled }.forEach { app ->
-                    AllowedAppRow(
-                        app = app,
-                        onClick = {
-                            val launchIntent = context.packageManager.getLaunchIntentForPackage(app.packageName)
-                            if (launchIntent != null) {
-                                context.startActivity(launchIntent)
-                            } else {
-                                Toast.makeText(
-                                    context,
-                                    "Abriendo ${app.name}...",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                        }
+                    Spacer(modifier = Modifier.width(10.dp))
+                    Text(
+                        text = "Toca el botón verde superior 'Iniciar Pantalla Principal de Android' para ir a tu inicio.",
+                        fontSize = 12.sp,
+                        color = Color(0xFF334155),
+                        lineHeight = 16.sp
                     )
                 }
             }
         }
 
         Spacer(modifier = Modifier.height(30.dp))
-    }
-}
-
-@Composable
-private fun AppGridItem(
-    appItem: InstalledAppItem,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Column(
-        modifier = modifier
-            .clip(RoundedCornerShape(14.dp))
-            .clickable { onClick() }
-            .padding(vertical = 8.dp, horizontal = 4.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        AppIconView(appItem = appItem, size = 52.dp)
-        Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = appItem.label,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color(0xFF1E293B),
-            maxLines = 2,
-            overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center,
-            lineHeight = 14.sp
-        )
-    }
-}
-
-@Composable
-private fun AppIconView(appItem: InstalledAppItem, size: androidx.compose.ui.unit.Dp) {
-    val bitmap = remember(appItem.icon) {
-        try {
-            appItem.icon?.toBitmap(width = 96, height = 96, config = Bitmap.Config.ARGB_8888)?.asImageBitmap()
-        } catch (_: Exception) {
-            null
-        }
-    }
-
-    if (bitmap != null) {
-        Image(
-            bitmap = bitmap,
-            contentDescription = appItem.label,
-            modifier = Modifier
-                .size(size)
-                .clip(RoundedCornerShape(12.dp))
-        )
-    } else {
-        Box(
-            modifier = Modifier
-                .size(size)
-                .clip(RoundedCornerShape(12.dp))
-                .background(SchoolBluePrimary.copy(alpha = 0.12f)),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = appItem.label.take(1).uppercase(),
-                fontWeight = FontWeight.Bold,
-                color = SchoolBluePrimary,
-                fontSize = if (size > 44.dp) 20.sp else 16.sp
-            )
-        }
     }
 }
 
@@ -674,57 +575,6 @@ private fun QuickFeatureCard(
                     color = Color(0xFF64748B)
                 )
             }
-        }
-    }
-}
-
-@Composable
-private fun AllowedAppRow(app: AllowedApp, onClick: () -> Unit) {
-    Surface(
-        onClick = onClick,
-        shape = RoundedCornerShape(14.dp),
-        color = Color.White,
-        shadowElevation = 1.dp,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        Row(
-            modifier = Modifier.padding(14.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(RoundedCornerShape(10.dp))
-                    .background(SchoolBluePrimary.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Apps,
-                    contentDescription = null,
-                    tint = SchoolBluePrimary,
-                    modifier = Modifier.size(22.dp)
-                )
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = app.name,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.sp,
-                    color = Color(0xFF0F172A)
-                )
-                Text(
-                    text = app.category,
-                    fontSize = 11.sp,
-                    color = Color(0xFF64748B)
-                )
-            }
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                contentDescription = null,
-                tint = Color(0xFF94A3B8),
-                modifier = Modifier.size(18.dp)
-            )
         }
     }
 }
