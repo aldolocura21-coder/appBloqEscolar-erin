@@ -2,6 +2,7 @@ package com.example
 
 import android.app.Activity
 import android.os.Bundle
+import android.view.KeyEvent
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -61,6 +62,39 @@ class MainActivity : ComponentActivity() {
     override fun onResume() {
         super.onResume()
         viewModel.loadInstalledApps()
+        viewModel.checkAndEnforceLock()
+    }
+
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            val state = viewModel.uiState.value
+            when (state.currentScreen) {
+                AppScreen.LOCK -> {
+                    Toast.makeText(
+                        this,
+                        "¡Teléfono bloqueado! Resuelve un reto escolar para usar el teléfono.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return true
+                }
+                AppScreen.ACTIVITY_RUNNER -> {
+                    viewModel.cancelChallengeAndReturnToLock()
+                    Toast.makeText(
+                        this,
+                        "Reto cancelado. El teléfono continúa bloqueado.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return true
+                }
+                AppScreen.ONBOARDING -> {
+                    return true
+                }
+                else -> {
+                    // Let other screens handle back
+                }
+            }
+        }
+        return super.onKeyDown(keyCode, event)
     }
 }
 
@@ -69,6 +103,7 @@ fun BloqEscolarApp(
     viewModel: BloqEscolarViewModel,
     onExitToBackground: () -> Unit
 ) {
+    val context = LocalContext.current
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
@@ -93,14 +128,29 @@ fun BloqEscolarApp(
     // Handle back button navigation
     BackHandler(enabled = true) {
         when (state.currentScreen) {
-            AppScreen.ACTIVITY_RUNNER, AppScreen.AVATAR_CREATOR, AppScreen.WEEKEND_HUB -> {
-                viewModel.navigateBack()
+            AppScreen.ACTIVITY_RUNNER -> {
+                // If user presses back during challenge, cancel challenge and return to LOCK screen.
+                // NEVER exit to Android or unlock without solving!
+                viewModel.cancelChallengeAndReturnToLock()
+                Toast.makeText(
+                    context,
+                    "Reto cancelado. El teléfono continúa bloqueado.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            AppScreen.LOCK -> {
+                // Keep locked on lock screen, do NOT exit
+                Toast.makeText(
+                    context,
+                    "¡Teléfono bloqueado! Resuelve un reto escolar para usar el teléfono.",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
             AppScreen.ONBOARDING -> {
                 // Keep in onboarding until user completes
             }
-            AppScreen.LOCK -> {
-                // If locked, prevent leaving back into unrestricted phone unless unlocked
+            AppScreen.AVATAR_CREATOR, AppScreen.WEEKEND_HUB -> {
+                viewModel.navigateBack()
             }
             AppScreen.UNLOCKED -> {
                 // In unlocked mode, pressing back minimizes the app to let user use their phone!
@@ -161,7 +211,7 @@ fun BloqEscolarApp(
                         onSelectOption = { viewModel.selectActivityOption(it) },
                         onCheckAnswer = { viewModel.checkAnswer() },
                         onNextQuestion = { viewModel.nextQuestionOrFinish() },
-                        onBackClick = { viewModel.navigateBack() },
+                        onBackClick = { viewModel.cancelChallengeAndReturnToLock() },
                         onFinishAndUnlock = { viewModel.navigateTo(AppScreen.UNLOCKED) },
                         onExitToBackground = {
                             viewModel.navigateTo(AppScreen.UNLOCKED)

@@ -96,7 +96,7 @@ class BloqEscolarViewModel(application: Application) : AndroidViewModel(applicat
 
         val remainingSecs = if (unlockedUntil > now) (unlockedUntil - now) / 1000L else 0L
         val schoolHours = checkIsSchoolHours(loadedSettings)
-        val locked = schoolHours && remainingSecs <= 0
+        val locked = remainingSecs <= 0
 
         val initialScreen = if (!loadedProfile.isOnboardingCompleted) {
             AppScreen.ONBOARDING
@@ -150,7 +150,7 @@ class BloqEscolarViewModel(application: Application) : AndroidViewModel(applicat
                 val now = System.currentTimeMillis()
                 val remaining = if (unlockedUntil > now) (unlockedUntil - now) / 1000L else 0L
                 val schoolHours = checkIsSchoolHours(_uiState.value.parentSettings)
-                val shouldBeLocked = schoolHours && remaining <= 0
+                val shouldBeLocked = remaining <= 0
 
                 val wasUnlocked = _uiState.value.remainingUnlockedSeconds > 0
 
@@ -183,6 +183,26 @@ class BloqEscolarViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
+    fun checkAndEnforceLock() {
+        val unlockedUntil = prefs.getUnlockedUntilTimestamp()
+        val now = System.currentTimeMillis()
+        val remaining = if (unlockedUntil > now) (unlockedUntil - now) / 1000L else 0L
+        if (remaining <= 0) {
+            _uiState.update { current ->
+                val targetScreen = if (current.currentScreen == AppScreen.ONBOARDING || current.currentScreen == AppScreen.ACTIVITY_RUNNER) {
+                    current.currentScreen
+                } else {
+                    AppScreen.LOCK
+                }
+                current.copy(
+                    remainingUnlockedSeconds = 0L,
+                    isLocked = true,
+                    currentScreen = targetScreen
+                )
+            }
+        }
+    }
+
     fun navigateTo(screen: AppScreen) {
         _uiState.update {
             it.copy(
@@ -196,13 +216,33 @@ class BloqEscolarViewModel(application: Application) : AndroidViewModel(applicat
     fun navigateBack() {
         _uiState.update {
             val destination = when (it.currentScreen) {
-                AppScreen.ACTIVITY_RUNNER, AppScreen.AVATAR_CREATOR, AppScreen.WEEKEND_HUB,
-                AppScreen.PARENTAL_CONTROLS, AppScreen.LAUNCHER_HELP -> {
-                    if (it.isLocked) AppScreen.LOCK else AppScreen.UNLOCKED
+                AppScreen.ACTIVITY_RUNNER -> {
+                    // Cancelling a challenge without finishing NEVER unlocks the phone!
+                    AppScreen.LOCK
                 }
-                else -> it.previousScreen
+                AppScreen.AVATAR_CREATOR, AppScreen.WEEKEND_HUB,
+                AppScreen.PARENTAL_CONTROLS, AppScreen.LAUNCHER_HELP -> {
+                    if (it.remainingUnlockedSeconds > 0 && !it.isLocked) AppScreen.UNLOCKED else AppScreen.LOCK
+                }
+                else -> {
+                    if (it.remainingUnlockedSeconds > 0 && !it.isLocked) AppScreen.UNLOCKED else AppScreen.LOCK
+                }
             }
-            it.copy(currentScreen = destination, parentPinError = null)
+            it.copy(
+                currentScreen = destination,
+                isLocked = it.remainingUnlockedSeconds <= 0,
+                parentPinError = null
+            )
+        }
+    }
+
+    fun cancelChallengeAndReturnToLock() {
+        _uiState.update {
+            it.copy(
+                currentScreen = AppScreen.LOCK,
+                isLocked = it.remainingUnlockedSeconds <= 0,
+                statusMessage = "Reto cancelado. El teléfono continúa bloqueado."
+            )
         }
     }
 

@@ -122,7 +122,7 @@ fun PhoneLockScreen(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "Horario Escolar Protegido",
+                    text = if (state.isSchoolHoursActive) "Horario Escolar Protegido" else "Bloqueo Educativo Activo",
                     color = Color.White,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 13.sp
