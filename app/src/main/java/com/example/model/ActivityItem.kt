@@ -1,13 +1,24 @@
 package com.example.model
 
-enum class Subject(val displayName: String, val iconName: String) {
-    MATH("Matemáticas", "calculate"),
-    LANGUAGE("Lengua y Lectura", "menu_book"),
-    SCIENCE("Ciencias Naturales", "biotech"),
-    HISTORY("Historia y Geo", "public"),
-    LOGIC("Lógica y Acertijos", "psychology"),
-    FAMILY("En Familia con Adultos", "family_restroom"),
-    AI_SPECIAL("Misión IA Gemini", "auto_awesome")
+enum class Subject(val displayName: String, val iconName: String, val category: String = "General") {
+    MATH("Matemática", "calculate", "Curricular"),
+    LANGUAGE("Prácticas del Lenguaje", "menu_book", "Curricular"),
+    SCIENCE("Ciencias Naturales y Biología", "biotech", "Curricular"),
+    PHYSICS_CHEMISTRY("Física y Química", "science", "Curricular"),
+    HISTORY("Ciencias Sociales y Geografía", "public", "Curricular"),
+    ARGENTINE_HISTORY("Historia Argentina", "account_balance", "Curricular"),
+    CITIZENSHIP("Construcción de Ciudadanía y Ética", "gavel", "Curricular"),
+    ENGLISH("Idioma Extranjero (Inglés)", "language", "Idiomas"),
+    INFORMATICS("Informática y Computación", "computer", "Tecnología"),
+    ROBOTICS("Robótica y Programación", "smart_toy", "Tecnología"),
+    ARTIFICIAL_INTELLIGENCE("Inteligencia Artificial", "psychology", "Tecnología"),
+    PHYSICAL_EDUCATION("Educación Física y Deportes", "sports_soccer", "Curricular"),
+    ART_MUSIC("Educación Artística y Música", "palette", "Curricular"),
+    ENVIRONMENT("Ecología y Medio Ambiente", "eco", "Transversal"),
+    FINANCIAL_EDUCATION("Educación Financiera", "savings", "Transversal"),
+    LOGIC("Lógica y Acertijos", "extension", "Transversal"),
+    FAMILY("En Familia con Adultos", "family_restroom", "Familiar"),
+    AI_SPECIAL("Misión IA Gemini", "auto_awesome", "Especial")
 }
 
 data class ActivityQuestion(

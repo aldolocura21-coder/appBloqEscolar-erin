@@ -67,16 +67,15 @@ import java.util.Locale
 @Composable
 fun PhoneLockScreen(
     state: BloqUiState,
-    onStartChallenge: (Subject) -> Unit,
+    onStartChallenge: (Subject?) -> Unit,
     onOpenEmergency: () -> Unit,
     onOpenParentControl: () -> Unit,
     onOpenAvatarCreator: () -> Unit,
     onOpenWeekendHub: () -> Unit,
-    onOpenLauncherHelp: () -> Unit
+    onOpenLauncherHelp: () -> Unit,
+    isPinned: Boolean = false,
+    onTogglePinScreen: () -> Unit = {}
 ) {
-    var selectedSubject by remember(state.isFamilyDay) {
-        mutableStateOf(if (state.isFamilyDay) Subject.FAMILY else Subject.MATH)
-    }
     val timeFormat = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
     val currentTime = remember { timeFormat.format(Date()) }
 
@@ -140,7 +139,6 @@ fun PhoneLockScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            selectedSubject = Subject.FAMILY
                             onStartChallenge(Subject.FAMILY)
                         }
                         .testTag("family_day_banner"),
@@ -198,7 +196,6 @@ fun PhoneLockScreen(
                         Spacer(modifier = Modifier.width(6.dp))
                         Button(
                             onClick = {
-                                selectedSubject = Subject.FAMILY
                                 onStartChallenge(Subject.FAMILY)
                             },
                             colors = ButtonDefaults.buttonColors(
@@ -298,107 +295,183 @@ fun PhoneLockScreen(
 
             Spacer(modifier = Modifier.height(20.dp))
 
-            // 3. Challenge Selection Area
-            Text(
-                text = "Desbloquea 15 min resolviendo un reto:",
-                color = Color.White,
-                fontSize = 15.sp,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(10.dp))
-
-            // Subject chips - Fila 1
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                SubjectChip(
-                    subject = Subject.MATH,
-                    isSelected = selectedSubject == Subject.MATH,
-                    modifier = Modifier.weight(1f),
-                    onClick = { selectedSubject = Subject.MATH }
-                )
-                SubjectChip(
-                    subject = Subject.LANGUAGE,
-                    isSelected = selectedSubject == Subject.LANGUAGE,
-                    modifier = Modifier.weight(1f),
-                    onClick = { selectedSubject = Subject.LANGUAGE }
-                )
-                SubjectChip(
-                    subject = Subject.SCIENCE,
-                    isSelected = selectedSubject == Subject.SCIENCE,
-                    modifier = Modifier.weight(1f),
-                    onClick = { selectedSubject = Subject.SCIENCE }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Subject chips - Fila 2
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                SubjectChip(
-                    subject = Subject.HISTORY,
-                    isSelected = selectedSubject == Subject.HISTORY,
-                    modifier = Modifier.weight(1f),
-                    onClick = { selectedSubject = Subject.HISTORY }
-                )
-                SubjectChip(
-                    subject = Subject.LOGIC,
-                    isSelected = selectedSubject == Subject.LOGIC,
-                    modifier = Modifier.weight(1f),
-                    onClick = { selectedSubject = Subject.LOGIC }
-                )
-                SubjectChip(
-                    subject = Subject.FAMILY,
-                    isSelected = selectedSubject == Subject.FAMILY,
-                    modifier = Modifier.weight(1f),
-                    onClick = { selectedSubject = Subject.FAMILY }
-                )
-            }
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Subject chips - Fila 3: IA Gemini
-            SubjectChip(
-                subject = Subject.AI_SPECIAL,
-                isSelected = selectedSubject == Subject.AI_SPECIAL,
-                modifier = Modifier.fillMaxWidth(),
-                onClick = { selectedSubject = Subject.AI_SPECIAL }
-            )
-
-            Spacer(modifier = Modifier.height(18.dp))
-
-            // Big Action Button: Resolver Reto
-            Button(
-                onClick = { onStartChallenge(selectedSubject) },
+            // 3. Challenge Selection Card - Reto Aleatorio sin elección de asignatura
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(58.dp)
-                    .testTag("start_challenge_button"),
-                shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = if (selectedSubject == Subject.AI_SPECIAL) Color(0xFF7C3AED) else SchoolBluePrimary
-                )
+                    .testTag("random_challenge_card"),
+                shape = RoundedCornerShape(22.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF1E293B).copy(alpha = 0.95f)),
+                border = androidx.compose.foundation.BorderStroke(1.5.dp, Color(0xFF38BDF8).copy(alpha = 0.4f))
             ) {
-                Icon(
-                    imageVector = if (selectedSubject == Subject.AI_SPECIAL) Icons.Default.AutoAwesome else Icons.Default.PlayArrow,
-                    contentDescription = null,
-                    modifier = Modifier.size(22.dp)
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    text = "Comenzar Reto (${selectedSubject.displayName})",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(18.dp)
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(42.dp)
+                                .clip(CircleShape)
+                                .background(Color(0xFF0284C7).copy(alpha = 0.25f)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(text = "🎲", fontSize = 22.sp)
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Text(
+                                text = "Reto Escolar Aleatorio",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = "Asignaturas al azar de Argentina",
+                                color = Color(0xFF38BDF8),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.SemiBold
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    Text(
+                        text = "El reto selecciona 3 preguntas sorpresa entre todas las asignaturas escolares: Robótica, Informática, Inteligencia Artificial, Idioma Inglés, Matemática, Ed. Física, Lengua y Ciencias.",
+                        color = Color(0xFFCBD5E1),
+                        fontSize = 12.sp,
+                        lineHeight = 17.sp
+                    )
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
+                    // Chips informativos de materias
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf("🤖 Robótica", "💻 Informática", "🧠 IA", "🇬🇧 Inglés").forEach { tag ->
+                            Text(
+                                text = tag,
+                                color = Color(0xFFE2E8F0),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(Color(0xFF334155))
+                                    .padding(horizontal = 6.dp, vertical = 3.dp)
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(6.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf("📐 Matemática", "⚽ Ed. Física", "📚 Lengua", "🇦🇷 Historia").forEach { tag ->
+                            Text(
+                                text = tag,
+                                color = Color(0xFFE2E8F0),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier
+                                    .clip(RoundedCornerShape(6.dp))
+                                    .background(Color(0xFF334155))
+                                    .padding(horizontal = 6.dp, vertical = 3.dp)
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    // Big Action Button: Resolver Reto Aleatorio
+                    Button(
+                        onClick = { onStartChallenge(null) },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp)
+                            .testTag("start_challenge_button"),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = SchoolBluePrimary)
+                    ) {
+                        Text(text = "🎲", fontSize = 18.sp)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Resolver Reto Aleatorio (+15 min)",
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(14.dp))
+
+            // Tarjeta de Seguridad Botón Recientes (3 Palitos)
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(),
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFF0F172A).copy(alpha = 0.85f)),
+                border = androidx.compose.foundation.BorderStroke(1.dp, Color(0xFF334155))
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(LockRed.copy(alpha = 0.2f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Security,
+                            contentDescription = null,
+                            tint = Color(0xFFF87171),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Bloqueo '3 Palitos' (Recientes)",
+                            color = Color.White,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Text(
+                            text = if (isPinned) "Pantalla fijada activada. Botón de recientes deshabilitado." else "Fija la pantalla para inhabilitar el botón de recientes.",
+                            color = Color(0xFF94A3B8),
+                            fontSize = 11.sp,
+                            lineHeight = 15.sp
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = onTogglePinScreen,
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = if (isPinned) SuccessGreen else Color(0xFF334155),
+                            contentColor = Color.White
+                        ),
+                        shape = RoundedCornerShape(10.dp),
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 10.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = if (isPinned) "Fijado ✓" else "Fijar",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(14.dp))
 
             // Secondary Quick Actions
             Row(
@@ -465,33 +538,6 @@ fun PhoneLockScreen(
             }
 
             Spacer(modifier = Modifier.height(28.dp))
-        }
-    }
-}
-
-@Composable
-private fun SubjectChip(
-    subject: Subject,
-    isSelected: Boolean,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit
-) {
-    Surface(
-        onClick = onClick,
-        modifier = modifier.height(44.dp),
-        shape = RoundedCornerShape(12.dp),
-        color = if (isSelected) SchoolBluePrimary else Color(0xFF334155),
-        shadowElevation = if (isSelected) 4.dp else 0.dp
-    ) {
-        Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(horizontal = 6.dp)) {
-            Text(
-                text = subject.displayName,
-                color = if (isSelected) Color.White else Color(0xFFCBD5E1),
-                fontSize = 11.sp,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                textAlign = TextAlign.Center,
-                maxLines = 1
-            )
         }
     }
 }

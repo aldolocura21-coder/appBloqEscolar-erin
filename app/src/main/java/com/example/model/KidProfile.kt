@@ -12,7 +12,7 @@ data class AvatarConfig(
 data class KidProfile(
     val name: String = "Estudiante",
     val age: Int = 10,
-    val gradeLevel: String = "Primaria Superior (4°-6°)",
+    val gradeLevel: String = "Primaria - 2° Ciclo (4° a 7° Grado)",
     val avatar: AvatarConfig = AvatarConfig(),
     val xp: Int = 120,
     val coins: Int = 45,

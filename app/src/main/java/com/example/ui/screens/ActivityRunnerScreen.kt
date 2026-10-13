@@ -82,7 +82,7 @@ fun ActivityRunnerScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = activityState.selectedSubject.displayName,
+                        text = "🎲 Reto Escolar Aleatorio",
                         fontWeight = FontWeight.Bold,
                         fontSize = 18.sp
                     )
@@ -236,6 +236,22 @@ fun ActivityRunnerScreen(
                                 }
                             }
                             Spacer(modifier = Modifier.height(12.dp))
+                        }
+
+                        // Subject Badge for current question
+                        Surface(
+                            shape = RoundedCornerShape(20.dp),
+                            color = SchoolBluePrimary.copy(alpha = 0.1f),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, SchoolBluePrimary.copy(alpha = 0.25f)),
+                            modifier = Modifier.padding(bottom = 12.dp)
+                        ) {
+                            Text(
+                                text = "Materia: ${currentQuestion.subject.displayName}",
+                                color = SchoolBluePrimary,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 14.dp, vertical = 6.dp)
+                            )
                         }
 
                         // Question Card

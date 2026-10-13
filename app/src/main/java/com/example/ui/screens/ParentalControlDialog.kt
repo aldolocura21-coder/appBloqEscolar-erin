@@ -293,10 +293,10 @@ fun ParentalControlDialog(
                             Text(text = "La IA adapta la dificultad de los retos a este nivel", fontSize = 12.sp, color = Color.Gray)
                             Spacer(modifier = Modifier.height(8.dp))
                             val gradesList = listOf(
-                                "Primaria Inicial (1°-3°)",
-                                "Primaria Superior (4°-6°)",
-                                "Secundaria Inicial (1°-2°)",
-                                "Secundaria Superior (3°-4°)"
+                                "Primaria - 1° Ciclo (1° a 3° Grado)",
+                                "Primaria - 2° Ciclo (4° a 7° Grado)",
+                                "Secundaria - Ciclo Básico (1° a 3° Año)",
+                                "Secundaria - Ciclo Orientado (4° a 6° Año)"
                             )
                             Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
                                 gradesList.forEach { gr ->
@@ -368,29 +368,53 @@ fun ParentalControlDialog(
                             )
                         }
 
-                        // Info de seguridad y apps recientes
+                        // Info de seguridad y apps recientes ("3 palitos")
                         Surface(
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(12.dp),
                             color = Color(0xFFF1F5F9)
                         ) {
-                            Row(
-                                modifier = Modifier.padding(12.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Security,
-                                    contentDescription = null,
-                                    tint = SchoolBluePrimary,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                Spacer(modifier = Modifier.width(8.dp))
+                            Column(modifier = Modifier.padding(12.dp)) {
+                                Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Icon(
+                                        imageVector = Icons.Default.Security,
+                                        contentDescription = null,
+                                        tint = SchoolBluePrimary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(
+                                        text = "Protección Antisalida ('3 Palitos'):",
+                                        fontSize = 12.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = Color(0xFF0F172A)
+                                    )
+                                }
+                                Spacer(modifier = Modifier.height(6.dp))
                                 Text(
-                                    text = "Protección Antisalida: El botón de aplicaciones recientes y notificaciones se bloquea reordenando esta pantalla automáticamente.",
+                                    text = "El servicio de accesibilidad cierra automáticamente el menú de aplicaciones recientes ('|||') cuando el teléfono está bloqueado para que el alumno no pueda ingresar a otras apps.",
                                     fontSize = 11.sp,
                                     color = Color(0xFF334155),
                                     lineHeight = 15.sp
                                 )
+                                Spacer(modifier = Modifier.height(10.dp))
+                                Button(
+                                    onClick = {
+                                        try {
+                                            val intent = android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
+                                                addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                                            }
+                                            context.startActivity(intent)
+                                        } catch (_: Exception) {}
+                                    },
+                                    colors = ButtonDefaults.buttonColors(containerColor = SchoolBluePrimary),
+                                    shape = RoundedCornerShape(10.dp),
+                                    modifier = Modifier.fillMaxWidth().height(42.dp)
+                                ) {
+                                    Icon(imageVector = Icons.Default.Security, contentDescription = null, modifier = Modifier.size(16.dp))
+                                    Spacer(modifier = Modifier.width(6.dp))
+                                    Text("Activar Servicio Antisalida en Ajustes", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                }
                             }
                         }
 

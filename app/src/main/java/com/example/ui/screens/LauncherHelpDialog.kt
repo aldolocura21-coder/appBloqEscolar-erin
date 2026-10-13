@@ -99,15 +99,16 @@ fun LauncherHelpDialog(
                 Spacer(modifier = Modifier.height(6.dp))
 
                 Text(
-                    text = "1. Configura BloqEscolar como aplicación de inicio (Launcher predeterminado) para que el botón 'Home' siempre vuelva al bloqueo escolar.\n\n" +
-                            "2. Durante el horario escolar configurado, las apps recreativas quedan restringidas hasta que el estudiante complete sus retos diarios de estudio.\n\n" +
-                            "3. Puedes desactivar o desbloquear temporalmente en cualquier momento mediante tu PIN parental privado.",
+                    text = "1. Configura BloqEscolar como app de inicio (Launcher) para que el botón 'Home' siempre vuelva a la pantalla de bloqueo escolar.\n\n" +
+                            "2. Bloqueo de '3 Palitos' (Recientes): Puedes pulsar el botón 'Fijar' en la pantalla de bloqueo para desactivar físicamente el botón de apps recientes, o activar el 'Servicio de Accesibilidad' para que el sistema cierre automáticamente el menú de recientes si el alumno intenta salir.\n\n" +
+                            "3. Reto Escolar Aleatorio: Las preguntas se seleccionan al azar entre todas las asignaturas de Argentina (Robótica, Informática, IA, Inglés, Matemática, Ed. Física, etc.).\n\n" +
+                            "4. En cualquier momento puedes desbloquear usando tu PIN parental privado.",
                     fontSize = 13.sp,
                     color = Color(0xFF475569),
                     lineHeight = 18.sp
                 )
 
-                Spacer(modifier = Modifier.height(20.dp))
+                Spacer(modifier = Modifier.height(18.dp))
 
                 Button(
                     onClick = {
@@ -131,7 +132,28 @@ fun LauncherHelpDialog(
                     Text("Configurar como App de Inicio", fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+                Spacer(modifier = Modifier.height(8.dp))
+
+                OutlinedButton(
+                    onClick = {
+                        try {
+                            val intent = Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS).apply {
+                                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                            }
+                            context.startActivity(intent)
+                        } catch (_: Exception) {}
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(46.dp),
+                    shape = RoundedCornerShape(14.dp)
+                ) {
+                    Icon(imageVector = Icons.Default.Security, contentDescription = null, modifier = Modifier.size(18.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Activar Servicio Antisalida (Recientes)", fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
+                }
+
+                Spacer(modifier = Modifier.height(8.dp))
 
                 OutlinedButton(
                     onClick = onDismiss,

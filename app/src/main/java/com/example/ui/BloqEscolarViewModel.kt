@@ -300,13 +300,13 @@ class BloqEscolarViewModel(application: Application) : AndroidViewModel(applicat
 
     // --- Educational Activity Flow ---
 
-    fun startChallenge(subject: Subject) {
+    fun startChallenge(subject: Subject? = null) {
         _uiState.update {
             it.copy(
                 currentScreen = AppScreen.ACTIVITY_RUNNER,
                 activityState = ActivityState(
                     isLoading = true,
-                    selectedSubject = subject
+                    selectedSubject = subject ?: Subject.LOGIC
                 )
             )
         }
@@ -319,10 +319,13 @@ class BloqEscolarViewModel(application: Application) : AndroidViewModel(applicat
                 count = 3
             )
 
+            val displaySubject = subject ?: questions.firstOrNull()?.subject ?: Subject.LOGIC
+
             _uiState.update {
                 it.copy(
                     activityState = it.activityState.copy(
                         isLoading = false,
+                        selectedSubject = displaySubject,
                         questions = questions,
                         currentIndex = 0,
                         selectedOptionIndex = null,

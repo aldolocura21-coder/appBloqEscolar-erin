@@ -72,7 +72,7 @@ object GeminiAiService {
     private val apiService: GeminiApiService = retrofit.create(GeminiApiService::class.java)
 
     suspend fun generateQuestions(
-        subject: Subject,
+        subject: Subject? = null,
         gradeLevel: String,
         age: Int = 10,
         count: Int = 3
@@ -87,14 +87,20 @@ object GeminiAiService {
             return@withContext EducationalQuestionsRepository.getRandomQuestions(count, subject)
         }
 
-        val subjectContext = if (subject == Subject.FAMILY) {
-            "El tema es 'Interacción en Familia con Adultos'. Las preguntas deben ser retos para que el niño/a dialogue, pregunte o interactúe con un adulto (mamá, papá o familiar) como acertijos compartidos, preguntas de su infancia o cálculo mental conjunto."
-        } else {
-            "Genera preguntas educativas para la materia '${subject.displayName}', con dificultad adaptada perfectamente a un niño/a de $age años ($gradeLevel)."
+        val subjectContext = when {
+            subject == Subject.FAMILY -> {
+                "El tema es 'Interacción en Familia con Adultos'. Las preguntas deben ser retos para que el niño/a dialogue, pregunte o interactúe con un adulto (mamá, papá o familiar) como acertijos compartidos, preguntas de su infancia o cálculo mental conjunto."
+            }
+            subject != null -> {
+                "Genera preguntas educativas para la materia '${subject.displayName}', con dificultad adaptada perfectamente a un estudiante de $age años ($gradeLevel del sistema educativo argentino)."
+            }
+            else -> {
+                "Genera un reto aleatorio de 3 preguntas de diversas materias del sistema educativo de Argentina (combinando asignaturas curriculares y extracurriculares como Matemática, Prácticas del Lenguaje, Robótica, Informática, Inteligencia Artificial, Idioma Inglés, Ciencias o Educación Física) adaptadas para un estudiante de $age años ($gradeLevel)."
+            }
         }
 
         val prompt = """
-            Eres un profesor pedagógico experto para un estudiante de $age años (Nivel educativo escolar: $gradeLevel).
+            Eres un profesor pedagógico experto en educación de Argentina para un estudiante de $age años (Nivel escolar: $gradeLevel).
             $subjectContext
             Devuelve ÚNICAMENTE un formato JSON estricto con la siguiente estructura y sin bloques de código markdown:
             [
@@ -117,7 +123,7 @@ object GeminiAiService {
             val textOutput = response.candidates?.firstOrNull()?.content?.parts?.firstOrNull()?.text
 
             if (!textOutput.isNullOrBlank()) {
-                val parsed = parseQuestionsFromJson(textOutput, subject)
+                val parsed = parseQuestionsFromJson(textOutput, subject ?: Subject.MATH)
                 if (parsed.isNotEmpty()) {
                     return@withContext parsed
                 }

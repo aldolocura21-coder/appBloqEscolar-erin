@@ -81,7 +81,7 @@ import com.example.util.InstalledAppItem
 @Composable
 fun PhoneUnlockedScreen(
     state: BloqUiState,
-    onMoreTimeClick: (Subject) -> Unit,
+    onMoreTimeClick: (Subject?) -> Unit,
     onLockNowClick: () -> Unit,
     onOpenAvatarCreator: () -> Unit,
     onOpenWeekendHub: () -> Unit,
@@ -319,7 +319,7 @@ fun PhoneUnlockedScreen(
                     horizontalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     Button(
-                        onClick = { onMoreTimeClick(Subject.MATH) },
+                        onClick = { onMoreTimeClick(null) },
                         modifier = Modifier
                             .weight(1f)
                             .height(46.dp)

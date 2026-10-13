@@ -75,10 +75,10 @@ fun OnboardingProfileScreen(
     val avatarTabs = listOf("Piel", "Cabello", "Uniforme", "Expresión")
 
     val gradeOptions = listOf(
-        "Primaria Inicial (1°-3°)",
-        "Primaria Superior (4°-6°)",
-        "Secundaria Inicial (1°-2°)",
-        "Secundaria Superior (3°-4°)"
+        "Primaria - 1° Ciclo (1° a 3° Grado)",
+        "Primaria - 2° Ciclo (4° a 7° Grado)",
+        "Secundaria - Ciclo Básico (1° a 3° Año)",
+        "Secundaria - Ciclo Orientado (4° a 6° Año)"
     )
 
     Box(

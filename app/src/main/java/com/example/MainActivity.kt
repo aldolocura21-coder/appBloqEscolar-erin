@@ -49,6 +49,8 @@ class MainActivity : ComponentActivity() {
             MyApplicationTheme {
                 BloqEscolarApp(
                     viewModel = viewModel,
+                    isPinned = isPinnedScreen,
+                    onTogglePinScreen = { toggleScreenPinning() },
                     onExitToBackground = {
                         val launched = DeviceAppsManager.exitToSystemHomeScreen(this@MainActivity)
                         if (!launched) {
@@ -60,6 +62,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    private var isPinnedScreen = false
+
+    fun toggleScreenPinning() {
+        try {
+            if (isPinnedScreen) {
+                stopLockTask()
+                isPinnedScreen = false
+                Toast.makeText(this, "Pantalla desfijada.", Toast.LENGTH_SHORT).show()
+            } else {
+                startLockTask()
+                isPinnedScreen = true
+                Toast.makeText(this, "🛡️ Pantalla fijada: ¡Botón de 3 palitos (recientes) bloqueado!", Toast.LENGTH_LONG).show()
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Para fijar pantalla, activa Fijar pantalla en Ajustes > Seguridad.", Toast.LENGTH_LONG).show()
+        }
+    }
+
     override fun onResume() {
         super.onResume()
         viewModel.loadInstalledApps()
@@ -68,6 +88,11 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
+        reassertLockToFrontIfNeeded()
+    }
+
+    override fun onStop() {
+        super.onStop()
         reassertLockToFrontIfNeeded()
     }
 
@@ -92,11 +117,24 @@ class MainActivity : ComponentActivity() {
     private fun reassertLockToFrontIfNeeded() {
         val state = viewModel.uiState.value
         if (state.isLocked && state.currentScreen in listOf(AppScreen.LOCK, AppScreen.ACTIVITY_RUNNER)) {
-            val intent = Intent(this, MainActivity::class.java).apply {
-                addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
-                addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
-            }
-            startActivity(intent)
+            try {
+                val am = getSystemService(ACTIVITY_SERVICE) as android.app.ActivityManager
+                am.moveTaskToFront(taskId, android.app.ActivityManager.MOVE_TASK_WITH_HOME)
+            } catch (_: Exception) {}
+
+            try {
+                val intent = Intent(this, MainActivity::class.java).apply {
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                    addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                }
+                startActivity(intent)
+            } catch (_: Exception) {}
+        } else if (!state.isLocked && isPinnedScreen) {
+            try {
+                stopLockTask()
+                isPinnedScreen = false
+            } catch (_: Exception) {}
         }
     }
 
@@ -148,6 +186,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun BloqEscolarApp(
     viewModel: BloqEscolarViewModel,
+    isPinned: Boolean = false,
+    onTogglePinScreen: () -> Unit = {},
     onExitToBackground: () -> Unit
 ) {
     val context = LocalContext.current
@@ -234,7 +274,9 @@ fun BloqEscolarApp(
                         onOpenParentControl = { showParentalModal = true },
                         onOpenAvatarCreator = { viewModel.navigateTo(AppScreen.AVATAR_CREATOR) },
                         onOpenWeekendHub = { viewModel.navigateTo(AppScreen.WEEKEND_HUB) },
-                        onOpenLauncherHelp = { showLauncherHelpModal = true }
+                        onOpenLauncherHelp = { showLauncherHelpModal = true },
+                        isPinned = isPinned,
+                        onTogglePinScreen = onTogglePinScreen
                     )
                 }
 
@@ -297,7 +339,9 @@ fun BloqEscolarApp(
                         onOpenParentControl = { showParentalModal = true },
                         onOpenAvatarCreator = { viewModel.navigateTo(AppScreen.AVATAR_CREATOR) },
                         onOpenWeekendHub = { viewModel.navigateTo(AppScreen.WEEKEND_HUB) },
-                        onOpenLauncherHelp = { showLauncherHelpModal = true }
+                        onOpenLauncherHelp = { showLauncherHelpModal = true },
+                        isPinned = isPinned,
+                        onTogglePinScreen = onTogglePinScreen
                     )
                 }
             }

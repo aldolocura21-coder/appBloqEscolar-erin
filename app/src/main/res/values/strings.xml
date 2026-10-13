@@ -11,4 +11,5 @@
     <string name="avatar_btn">Mi Avatar</string>
     <string name="weekend_hub_btn">Premios Fin de Semana</string>
     <string name="settings_btn">Control Parental</string>
+    <string name="accessibility_service_desc">Servicio de protección escolar de BloqEscolar para bloquear la salida mediante aplicaciones recientes y asegurar el modo estudio.</string>
 </resources>
