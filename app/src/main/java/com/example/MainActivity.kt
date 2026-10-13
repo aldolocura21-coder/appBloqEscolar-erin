@@ -48,7 +48,10 @@ class MainActivity : ComponentActivity() {
                 BloqEscolarApp(
                     viewModel = viewModel,
                     onExitToBackground = {
-                        DeviceAppsManager.exitToSystemHomeScreen(this@MainActivity)
+                        val launched = DeviceAppsManager.exitToSystemHomeScreen(this@MainActivity)
+                        if (!launched) {
+                            Toast.makeText(this@MainActivity, "Acceso desbloqueado al teléfono", Toast.LENGTH_SHORT).show()
+                        }
                     }
                 )
             }

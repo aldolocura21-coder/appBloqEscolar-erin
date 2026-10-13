@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.PhoneAndroid
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Button
@@ -489,7 +490,7 @@ private fun FinishedChallengeView(
 
         Spacer(modifier = Modifier.height(26.dp))
 
-        // PRIMARY BUTTON: SALIR AL TELÉFONO / EN SEGUNDO PLANO
+        // PRIMARY BUTTON: SALIR AL INICIO DE ANDROID
         Button(
             onClick = onExitToBackground,
             modifier = Modifier
@@ -502,7 +503,7 @@ private fun FinishedChallengeView(
             Icon(imageVector = Icons.Default.PhoneAndroid, contentDescription = null, modifier = Modifier.size(20.dp))
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "🚀 ¡Usar Teléfono Ahora! (Minimizar)",
+                text = "🚀 Iniciar Android Normal",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -510,18 +511,38 @@ private fun FinishedChallengeView(
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        OutlinedButton(
+        Button(
             onClick = onContinue,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(48.dp)
+                .height(50.dp)
                 .testTag("claim_unlocked_time_button"),
-            shape = RoundedCornerShape(14.dp)
+            shape = RoundedCornerShape(14.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = SchoolBluePrimary)
         ) {
             Text(
-                text = "📱 Ver Panel y Apps Permitidas",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold
+                text = "📱 Abrir Cajón con Todas mis Apps",
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
+
+        val localContext = androidx.compose.ui.platform.LocalContext.current
+        OutlinedButton(
+            onClick = { com.example.util.DeviceAppsManager.openHomeSettings(localContext) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(46.dp),
+            shape = RoundedCornerShape(14.dp)
+        ) {
+            Icon(imageVector = Icons.Default.Settings, contentDescription = null, modifier = Modifier.size(16.dp))
+            Spacer(modifier = Modifier.width(6.dp))
+            Text(
+                text = "⚙️ Cambiar App de Inicio en Ajustes",
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium
             )
         }
     }
